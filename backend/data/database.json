@@ -1,0 +1,44 @@
+{
+  "contacts": [],
+  "outgoing_messages": [],
+  "incoming_messages": [],
+  "settings": {
+    "default_source": "+1234567890",
+    "theme": "light"
+  },
+  "users": [
+    {
+      "id": "d3a865bc-0039-4199-8cc3-6ab6a192c646",
+      "username": "admin",
+      "password": "NovaText2024!",
+      "role": "admin",
+      "created_at": "2025-12-09T19:31:06.406Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "34bc7f8f-9908-418d-a2dd-609ca181b709-e9e3361d-634f-469b-9a5f-5529b087eb57",
+      "userId": "d3a865bc-0039-4199-8cc3-6ab6a192c646",
+      "username": "admin",
+      "role": "admin",
+      "created_at": "2025-12-09T19:32:14.531Z",
+      "expires_at": "2025-12-10T19:32:14.531Z"
+    },
+    {
+      "token": "82976afc-17ba-4c3b-97d7-434befee0fc8-411092a6-51cd-471b-8778-181ec9bc8f5b",
+      "userId": "d3a865bc-0039-4199-8cc3-6ab6a192c646",
+      "username": "admin",
+      "role": "admin",
+      "created_at": "2025-12-09T19:32:37.942Z",
+      "expires_at": "2025-12-10T19:32:37.942Z"
+    },
+    {
+      "token": "3e818a30-3e42-4ae1-a5a6-b87121ea4e4e-940f9552-fb97-4aa3-9b3f-6778f778c94b",
+      "userId": "d3a865bc-0039-4199-8cc3-6ab6a192c646",
+      "username": "admin",
+      "role": "admin",
+      "created_at": "2025-12-09T21:06:06.543Z",
+      "expires_at": "2025-12-10T21:06:06.545Z"
+    }
+  ]
+}
