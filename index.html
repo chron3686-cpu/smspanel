@@ -1,18 +1,584 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NovaText Cloud - SMS Management Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/assets/index-Dm_N_ALs.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BedLisSQ.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaText Cloud - SMS Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-dark-900 text-white min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto rounded-2xl gradient-bg flex items-center justify-center shadow-2xl mb-4">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold">NovaText Cloud</h1>
+                <p class="text-dark-400 mt-2">Enterprise SMS Platform</p>
+            </div>
+            <div class="bg-dark-800/50 backdrop-blur rounded-2xl p-8 border border-dark-700">
+                <h2 class="text-xl font-semibold mb-6 text-center">Giriş Yap</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-dark-400 mb-2">Kullanıcı Adı</label>
+                        <input type="text" id="loginUser" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" placeholder="admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-dark-400 mb-2">Şifre</label>
+                        <input type="password" id="loginPass" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" placeholder="••••••••">
+                    </div>
+                    <div id="loginError" class="hidden p-3 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 text-sm"></div>
+                    <button onclick="login()" class="w-full py-3 gradient-bg rounded-xl font-medium hover:opacity-90 transition">Giriş Yap</button>
+                </div>
+                <p class="text-center text-dark-500 text-sm mt-6">Varsayılan: admin / NovaText2024!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-dark-800 border-r border-dark-700 p-4 z-50">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg">NovaText</h1>
+                    <p class="text-xs text-dark-400">Cloud Platform</p>
+                </div>
+            </div>
+            <nav class="space-y-2">
+                <button onclick="showPage('dashboard')" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-dark-700 transition" data-page="dashboard">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Dashboard
+                </button>
+                <button onclick="showPage('send')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-dark-700 transition" data-page="send">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    SMS Gönder
+                </button>
+                <button onclick="showPage('contacts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-dark-700 transition" data-page="contacts">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Kişiler
+                </button>
+                <button onclick="showPage('history')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-dark-700 transition" data-page="history">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Geçmiş
+                </button>
+                <button onclick="showPage('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-dark-700 transition" data-page="settings">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Ayarlar
+                </button>
+            </nav>
+            <div class="absolute bottom-4 left-4 right-4">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Çıkış
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 p-8">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page">
+                <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <p class="text-dark-400 text-sm">Bugün Gönderilen</p>
+                        <p class="text-3xl font-bold mt-2" id="stat-today">0</p>
+                        <p class="text-green-400 text-sm mt-1">+12%</p>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <p class="text-dark-400 text-sm">Başarılı</p>
+                        <p class="text-3xl font-bold mt-2 text-green-400" id="stat-success">0</p>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <p class="text-dark-400 text-sm">Başarısız</p>
+                        <p class="text-3xl font-bold mt-2 text-red-400" id="stat-failed">0</p>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <p class="text-dark-400 text-sm">Toplam Kişi</p>
+                        <p class="text-3xl font-bold mt-2" id="stat-contacts">0</p>
+                    </div>
+                </div>
+                <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                    <h3 class="text-lg font-semibold mb-4">Son Aktiviteler</h3>
+                    <div id="recent-activity" class="space-y-3">
+                        <p class="text-dark-400 text-center py-4">Henüz aktivite yok</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send SMS Page -->
+            <div id="page-send" class="page hidden">
+                <h2 class="text-2xl font-bold mb-6">SMS Gönder</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <h3 class="text-lg font-semibold mb-4">Tek SMS</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-dark-400 mb-2">Alıcı Numara</label>
+                                <input type="text" id="smsTo" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" placeholder="905551234567">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-dark-400 mb-2">Mesaj</label>
+                                <textarea id="smsMessage" rows="4" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none resize-none" placeholder="Mesajınızı yazın..."></textarea>
+                                <p class="text-dark-500 text-sm mt-1"><span id="charCount">0</span>/160 karakter</p>
+                            </div>
+                            <button onclick="sendSMS()" id="sendBtn" class="w-full py-3 gradient-bg rounded-xl font-medium hover:opacity-90 transition flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                SMS Gönder
+                            </button>
+                            <div id="smsResult" class="hidden p-4 rounded-xl"></div>
+                        </div>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <h3 class="text-lg font-semibold mb-4">Toplu SMS</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-dark-400 mb-2">Numaralar (her satıra bir tane)</label>
+                                <textarea id="bulkNumbers" rows="4" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none resize-none" placeholder="905551234567&#10;905559876543&#10;905553334455"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-dark-400 mb-2">Mesaj</label>
+                                <textarea id="bulkMessage" rows="3" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none resize-none" placeholder="Toplu mesajınızı yazın..."></textarea>
+                            </div>
+                            <button onclick="sendBulkSMS()" id="bulkSendBtn" class="w-full py-3 bg-purple-600 rounded-xl font-medium hover:bg-purple-700 transition">Toplu Gönder</button>
+                            <div id="bulkProgress" class="hidden">
+                                <div class="bg-dark-700 rounded-full h-2 overflow-hidden">
+                                    <div id="bulkProgressBar" class="gradient-bg h-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <p class="text-center text-sm text-dark-400 mt-2" id="bulkProgressText">0/0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts Page -->
+            <div id="page-contacts" class="page hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold">Kişiler</h2>
+                    <button onclick="showAddContact()" class="px-4 py-2 gradient-bg rounded-xl font-medium hover:opacity-90 transition flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Kişi Ekle
+                    </button>
+                </div>
+                <div class="bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-dark-700">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">İsim</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">Telefon</th>
+                                <th class="text-right px-6 py-4 text-sm font-semibold text-dark-400">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactsList" class="divide-y divide-dark-700">
+                        </tbody>
+                    </table>
+                    <div id="noContacts" class="p-8 text-center text-dark-400">
+                        Henüz kişi eklenmemiş
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Page -->
+            <div id="page-history" class="page hidden">
+                <h2 class="text-2xl font-bold mb-6">Mesaj Geçmişi</h2>
+                <div class="bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-dark-700">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">Tarih</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">Alıcı</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">Mesaj</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-dark-400">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyList" class="divide-y divide-dark-700">
+                        </tbody>
+                    </table>
+                    <div id="noHistory" class="p-8 text-center text-dark-400">
+                        Henüz mesaj gönderilmemiş
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page hidden">
+                <h2 class="text-2xl font-bold mb-6">Ayarlar</h2>
+                <div class="grid gap-6 max-w-2xl">
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <h3 class="text-lg font-semibold mb-4">Gönderici Numarası</h3>
+                        <input type="text" id="senderNumber" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" placeholder="+1234567890">
+                        <button onclick="saveSettings()" class="mt-4 px-6 py-2 gradient-bg rounded-xl font-medium hover:opacity-90 transition">Kaydet</button>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <h3 class="text-lg font-semibold mb-4">Şifre Değiştir</h3>
+                        <div class="space-y-4">
+                            <input type="password" id="newPassword" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Yeni şifre">
+                            <button onclick="changePassword()" class="px-6 py-2 bg-purple-600 rounded-xl font-medium hover:bg-purple-700 transition">Şifreyi Değiştir</button>
+                        </div>
+                    </div>
+                    <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700">
+                        <h3 class="text-lg font-semibold mb-4">Sistem Bilgisi</h3>
+                        <p class="text-dark-400">Versiyon: 1.0.0</p>
+                        <p class="text-dark-400">Platform: NovaText Cloud</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div id="addContactModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-dark-800 rounded-2xl p-6 w-full max-w-md border border-dark-700">
+            <h3 class="text-xl font-semibold mb-4">Kişi Ekle</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-dark-400 mb-2">İsim</label>
+                    <input type="text" id="contactName" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm text-dark-400 mb-2">Telefon</label>
+                    <input type="text" id="contactPhone" class="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="addContact()" class="flex-1 py-3 gradient-bg rounded-xl font-medium hover:opacity-90 transition">Kaydet</button>
+                    <button onclick="hideAddContact()" class="flex-1 py-3 bg-dark-600 rounded-xl font-medium hover:bg-dark-500 transition">İptal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_KEY = "ce10d3706c84619384e0d3b948900855315acfd145c0a7edea6a4bf216e8a18e";
+        const API_URL = "https://didlogic.com/api/v2/sms";
+
+        // Data Storage
+        let data = {
+            password: "NovaText2024!",
+            senderNumber: "+1234567890",
+            contacts: [],
+            messages: []
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('novatext-data');
+            if (saved) {
+                data = { ...data, ...JSON.parse(saved) };
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('novatext-data', JSON.stringify(data));
+        }
+
+        // Login
+        function login() {
+            const user = document.getElementById('loginUser').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            if (user === 'admin' && pass === data.password) {
+                localStorage.setItem('novatext-logged', 'true');
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                updateStats();
+                renderContacts();
+                renderHistory();
+            } else {
+                document.getElementById('loginError').textContent = 'Hatalı kullanıcı adı veya şifre!';
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('novatext-logged');
+            location.reload();
+        }
+
+        // Check login status
+        function checkLogin() {
+            loadData();
+            if (localStorage.getItem('novatext-logged') === 'true') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                updateStats();
+                renderContacts();
+                renderHistory();
+            }
+        }
+
+        // Show page
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-purple-600'));
+            document.querySelector(`[data-page="${page}"]`).classList.add('bg-purple-600');
+        }
+
+        // Update stats
+        function updateStats() {
+            const today = new Date().toDateString();
+            const todayMsgs = data.messages.filter(m => new Date(m.date).toDateString() === today);
+            document.getElementById('stat-today').textContent = todayMsgs.length;
+            document.getElementById('stat-success').textContent = data.messages.filter(m => m.status === 'success').length;
+            document.getElementById('stat-failed').textContent = data.messages.filter(m => m.status === 'failed').length;
+            document.getElementById('stat-contacts').textContent = data.contacts.length;
+            
+            // Recent activity
+            const recent = data.messages.slice(-5).reverse();
+            const activityHtml = recent.length ? recent.map(m => `
+                <div class="flex items-center justify-between p-3 bg-dark-700/50 rounded-xl">
+                    <div>
+                        <p class="font-medium">${m.to}</p>
+                        <p class="text-sm text-dark-400">${m.message.substring(0, 30)}...</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs rounded-full ${m.status === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${m.status === 'success' ? 'Başarılı' : 'Başarısız'}</span>
+                </div>
+            `).join('') : '<p class="text-dark-400 text-center py-4">Henüz aktivite yok</p>';
+            document.getElementById('recent-activity').innerHTML = activityHtml;
+        }
+
+        // Send SMS
+        async function sendSMS() {
+            const to = document.getElementById('smsTo').value.trim();
+            const message = document.getElementById('smsMessage').value.trim();
+            
+            if (!to || !message) {
+                showResult('smsResult', 'Lütfen tüm alanları doldurun!', false);
+                return;
+            }
+
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Gönderiliyor...';
+
+            try {
+                const response = await fetch(`${API_URL}?api_token=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sm: {
+                            source: data.senderNumber,
+                            destination: to,
+                            message: message
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                const success = response.ok;
+
+                data.messages.push({
+                    id: Date.now(),
+                    to: to,
+                    message: message,
+                    status: success ? 'success' : 'failed',
+                    date: new Date().toISOString()
+                });
+                saveData();
+                updateStats();
+                renderHistory();
+
+                showResult('smsResult', success ? 'SMS başarıyla gönderildi!' : 'SMS gönderilemedi!', success);
+                if (success) {
+                    document.getElementById('smsTo').value = '';
+                    document.getElementById('smsMessage').value = '';
+                    document.getElementById('charCount').textContent = '0';
+                }
+            } catch (error) {
+                showResult('smsResult', 'Bağlantı hatası!', false);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg> SMS Gönder';
+        }
+
+        // Bulk SMS
+        async function sendBulkSMS() {
+            const numbers = document.getElementById('bulkNumbers').value.trim().split('\n').filter(n => n.trim());
+            const message = document.getElementById('bulkMessage').value.trim();
+
+            if (!numbers.length || !message) {
+                alert('Lütfen numara ve mesaj girin!');
+                return;
+            }
+
+            document.getElementById('bulkProgress').classList.remove('hidden');
+            document.getElementById('bulkSendBtn').disabled = true;
+
+            for (let i = 0; i < numbers.length; i++) {
+                const to = numbers[i].trim();
+                try {
+                    const response = await fetch(`${API_URL}?api_token=${API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sm: { source: data.senderNumber, destination: to, message: message } })
+                    });
+                    data.messages.push({ id: Date.now(), to, message, status: response.ok ? 'success' : 'failed', date: new Date().toISOString() });
+                } catch {
+                    data.messages.push({ id: Date.now(), to, message, status: 'failed', date: new Date().toISOString() });
+                }
+
+                const progress = ((i + 1) / numbers.length) * 100;
+                document.getElementById('bulkProgressBar').style.width = progress + '%';
+                document.getElementById('bulkProgressText').textContent = `${i + 1}/${numbers.length}`;
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            saveData();
+            updateStats();
+            renderHistory();
+            document.getElementById('bulkSendBtn').disabled = false;
+            alert('Toplu gönderim tamamlandı!');
+        }
+
+        // Show result message
+        function showResult(id, message, success) {
+            const el = document.getElementById(id);
+            el.textContent = message;
+            el.className = `p-4 rounded-xl ${success ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 3000);
+        }
+
+        // Contacts
+        function showAddContact() {
+            document.getElementById('addContactModal').classList.remove('hidden');
+        }
+
+        function hideAddContact() {
+            document.getElementById('addContactModal').classList.add('hidden');
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+        }
+
+        function addContact() {
+            const name = document.getElementById('contactName').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            if (!name || !phone) return;
+
+            data.contacts.push({ id: Date.now(), name, phone });
+            saveData();
+            renderContacts();
+            updateStats();
+            hideAddContact();
+        }
+
+        function deleteContact(id) {
+            data.contacts = data.contacts.filter(c => c.id !== id);
+            saveData();
+            renderContacts();
+            updateStats();
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            const noContacts = document.getElementById('noContacts');
+            
+            if (data.contacts.length === 0) {
+                list.innerHTML = '';
+                noContacts.classList.remove('hidden');
+            } else {
+                noContacts.classList.add('hidden');
+                list.innerHTML = data.contacts.map(c => `
+                    <tr class="hover:bg-dark-700/50">
+                        <td class="px-6 py-4">${c.name}</td>
+                        <td class="px-6 py-4 font-mono">${c.phone}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="document.getElementById('smsTo').value='${c.phone}';showPage('send')" class="text-purple-400 hover:text-purple-300 mr-3">SMS</button>
+                            <button onclick="deleteContact(${c.id})" class="text-red-400 hover:text-red-300">Sil</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // History
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const noHistory = document.getElementById('noHistory');
+            
+            if (data.messages.length === 0) {
+                list.innerHTML = '';
+                noHistory.classList.remove('hidden');
+            } else {
+                noHistory.classList.add('hidden');
+                list.innerHTML = data.messages.slice().reverse().map(m => `
+                    <tr class="hover:bg-dark-700/50">
+                        <td class="px-6 py-4 text-sm">${new Date(m.date).toLocaleString('tr-TR')}</td>
+                        <td class="px-6 py-4 font-mono">${m.to}</td>
+                        <td class="px-6 py-4 text-sm text-dark-400">${m.message.substring(0, 40)}...</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full ${m.status === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${m.status === 'success' ? 'Başarılı' : 'Başarısız'}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Settings
+        function saveSettings() {
+            data.senderNumber = document.getElementById('senderNumber').value || data.senderNumber;
+            saveData();
+            alert('Ayarlar kaydedildi!');
+        }
+
+        function changePassword() {
+            const newPass = document.getElementById('newPassword').value;
+            if (newPass && newPass.length >= 6) {
+                data.password = newPass;
+                saveData();
+                alert('Şifre değiştirildi!');
+                document.getElementById('newPassword').value = '';
+            } else {
+                alert('Şifre en az 6 karakter olmalı!');
+            }
+        }
+
+        // Character counter
+        document.getElementById('smsMessage')?.addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        // Enter key for login
+        document.getElementById('loginPass')?.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Initialize
+        checkLogin();
+        document.getElementById('senderNumber').value = data.senderNumber;
+    </script>
+</body>
 </html>
 
